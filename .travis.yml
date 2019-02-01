@@ -1,0 +1,47 @@
+sudo: required
+
+language: generic
+
+services:
+  - docker
+
+env:
+  global:
+    - DOCKER_COMPOSE="docker-compose -f docker-compose.ci.yml"
+    - EXEC="$DOCKER_COMPOSE exec -T app"
+    - APP_IMAGE_NAME="mapiot/symfony-docker"
+    - DEV_TAG="dev-`{ find docker -type f -exec sha1sum {} \; && find Dockerfile -exec sha1sum {} \;; } | sort -k 2 | sha1sum | cut -d' ' -f 1 | cut -c1-7`"
+
+cache:
+  directories:
+    - node_modules
+    - $HOME/.composer/cache/files
+
+before_script:
+  - docker login -u $DOCKER_HUB_LOGIN -p $DOCKER_HUB_PASSWORD
+  - docker pull $APP_IMAGE_NAME:dev-latest || true
+  - docker pull $APP_IMAGE_NAME:$DEV_TAG || true
+
+script:
+  - make build
+  - make up
+  - make assets-build
+  - make vendor
+  - make lint security-check
+
+before_deploy:
+  - docker login -u $DOCKER_HUB_LOGIN -p $DOCKER_HUB_PASSWORD
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: bash docker/scripts/deploy-dev.sh
+    on:
+      repo: mpiot/symfony-docker
+      branch: develop
+  - provider: script
+    skip_cleanup: true
+    script: bash docker/scripts/deploy-prod.sh
+    on:
+      repo: mpiot/symfony-docker
+      tags: true
