@@ -1,9 +1,9 @@
 ARG NODE_VERSION=11.9.0
 ARG COMPOSER_VERSION=1.8.3
-ARG PHP_VERSION=7.2.14
+ARG PHP_VERSION=7.3.1
 ARG ICU_VERSION=63.1
 ARG APCU_VERSION=5.1.16
-ARG XDEBUG_VERSION=2.6.1
+ARG XDEBUG_VERSION=2.7.0RC1
 
 
 #####################################
@@ -20,12 +20,12 @@ ENV APP_VERSION=0.0.0
 WORKDIR /app
 
 # Install paquet requirements
-RUN export PHP_CPPFLAGS="${PHP_CPPFLAGS} -std=c++11" \
+RUN export PHP_CPPFLAGS="${PHP_CPPFLAGS} -std=c++11"; \
     set -ex; \
     # Install required system packages
     apt-get update; \
     apt-get install -qy --no-install-recommends \
-            zlib1g-dev \
+            libzip-dev \
             git \
     ; \
     # Compile ICU (required by intl php extension)
