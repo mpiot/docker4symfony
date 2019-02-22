@@ -26,7 +26,6 @@ RUN export PHP_CPPFLAGS="${PHP_CPPFLAGS} -std=c++11"; \
     apt-get update; \
     apt-get install -qy --no-install-recommends \
             libzip-dev \
-            git \
     ; \
     # Compile ICU (required by intl php extension)
     curl -L -o /tmp/icu.tar.gz http://download.icu-project.org/files/icu4c/${ICU_VERSION}/icu4c-$(echo ${ICU_VERSION} | sed s/\\./_/g)-src.tgz; \
@@ -102,6 +101,7 @@ RUN set -ex; \
     apt-get update; \
     apt-get install -qy --no-install-recommends \
             unzip \
+            git \
     ; \
     # Clean aptitude cache and tmp directory
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*;
