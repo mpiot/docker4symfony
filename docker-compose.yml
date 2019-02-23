@@ -1,17 +1,6 @@
 version: '3.4'
 
 services:
-    nginx:
-        build:
-            context: docker
-            dockerfile: NginxDockerfile
-        depends_on:
-            - app
-        networks:
-            - frontend
-        volumes:
-            - .:/app
-
     app:
         build:
             context: .
