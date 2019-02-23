@@ -1,7 +1,4 @@
 /.git
-/.idea
-/docker
-/files/*
 /public/build
 /public/bundles
 /var
@@ -9,7 +6,7 @@
 .dockerignore
 .editorconfig
 .gitignore
-.php_cs_dist
+.php_cs.dist
 .travis.yml
 bump-version.sh
 docker-compose.ci.yml

@@ -19,12 +19,16 @@ ENV APP_VERSION=0.0.0
 
 WORKDIR /app
 
+EXPOSE 80
+
 # Install paquet requirements
 RUN export PHP_CPPFLAGS="${PHP_CPPFLAGS} -std=c++11"; \
     set -ex; \
     # Install required system packages
     apt-get update; \
     apt-get install -qy --no-install-recommends \
+            nginx \
+            supervisor \
             libzip-dev \
     ; \
     # Compile ICU (required by intl php extension)
@@ -80,7 +84,11 @@ RUN { \
         echo 'memory_limit = -1'; \
     } > /usr/local/etc/php/php-cli.ini
 
-CMD ["php-fpm"]
+# copy the Nginx config
+COPY docker/nginx.conf /etc/nginx/
+
+# copy the Supervisor config
+COPY docker/supervisord.conf /etc/supervisor/conf.d/
 
 
 #####################################
@@ -142,6 +150,8 @@ RUN set -ex; \
         } >> /usr/local/etc/php/php.ini \
     ; fi
 
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
 
 #####################################
 ##       PROD ASSETS BUILDER       ##
@@ -153,12 +163,13 @@ WORKDIR /app
 
 RUN yarn install && yarn build && rm -R node_modules
 
+
 #####################################
 ##       PROD VENDOR BUILDER       ##
 #####################################
 FROM composer:${COMPOSER_VERSION} as vendor-builder
 
-COPY --from=assets-builder /app /app
+COPY --chown=www-data --from=assets-builder /app /app
 WORKDIR /app
 
 RUN APP_ENV=prod composer install -o -n --no-ansi --no-dev
@@ -179,3 +190,10 @@ RUN set -ex; \
     { \
         echo 'opcache.validate_timestamps = 0'; \
     } >> /usr/local/etc/php/php.ini
+
+# copy the Entrypoint
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
