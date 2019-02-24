@@ -10,8 +10,9 @@ A Docker base configuration for Symfony 4 application.
  4. In your [Travis account](https://travis-ci.org/), you must add 2 variables:
     * DOCKER_HUB_LOGIN, that contain your [DockerHub](https://hub.docker.com/) login
     * DOCKER_HUB_PASSWORD, that contain your [DockerHub](https://hub.docker.com/) password
- 5. Build, create and start your new Containerized application with `make install`
- 6. **Enjoy !**
+ 5. If you want to use the provided php_cs.dist file, you should check it, and update the Licence header
+ 6. Build, create and start your new Containerized application with `make install`
+ 7. **Enjoy !**
  
 ## Make file
 The Docker configuration come with a **Makefile**, use the command `make` to display all the possibilities (install, start, build assets, create db migration, db migrate, db rollback, tests, lint, etc...).
