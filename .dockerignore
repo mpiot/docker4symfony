@@ -7,7 +7,6 @@
 .editorconfig
 .gitignore
 .php_cs.dist
-.travis.yml
 bump-version.sh
 docker-compose.ci.yml
 docker-compose.override.yml.dist
