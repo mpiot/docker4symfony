@@ -1,6 +1,11 @@
 # Docker for Symfony
 A Docker base configuration for Symfony 4 application.
 
+There are 3 branchs:
+ - master: a simple Docker configuration
+ - travis: same as master, with TravisCi config for CI, and Delivery
+ - travis-azure: same as travis, but customized image for Azur Deployment
+
 ## Getting started
  1. [Download](https://github.com/mpiot/docker4symfony/archive/master.zip) a .zip archive of this repository
  2. Extract files in your Symfony project (resolve conflict with .gitignore, just add lines)
@@ -28,7 +33,7 @@ Because the application is containerized, when you connect in the Shell `make sh
 ## Xdebug configuration
 Xdebug is installed per default in the app image (in the development target build). You can remove it by passing a build argument in the *docker-compose.override.yml* file:
 
-    services:
+    services
     app:
         build:
             context: .
