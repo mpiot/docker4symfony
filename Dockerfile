@@ -150,7 +150,7 @@ RUN set -ex; \
         } >> /usr/local/etc/php/php.ini \
     ; fi
 
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["supervisord"]
 
 
 #####################################
@@ -196,4 +196,4 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["supervisord"]
