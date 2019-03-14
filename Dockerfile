@@ -101,7 +101,6 @@ ARG COMPOSER_VERSION
 ARG XDEBUG_VERSION
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
-ENV APP_ENV=dev
 
 # Install paquet requirements
 RUN set -ex; \
