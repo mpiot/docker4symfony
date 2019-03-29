@@ -14,7 +14,6 @@ FROM php:${PHP_VERSION}-fpm as app
 ARG ICU_VERSION
 ARG APCU_VERSION
 
-# Used for the ICU compilation
 ENV APP_VERSION=0.0.0
 
 WORKDIR /app
