@@ -1,6 +1,6 @@
 DOCKER_COMPOSE?=docker-compose
 EXEC?=$(DOCKER_COMPOSE) exec app
-CONSOLE=bin/console
+CONSOLE=php bin/console
 PHPCSFIXER?=$(EXEC) php -d memory_limit=1024m vendor/bin/php-cs-fixer
 
 .DEFAULT_GOAL := help
