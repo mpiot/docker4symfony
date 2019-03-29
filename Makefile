@@ -14,6 +14,7 @@ PHPCSFIXER?=$(EXEC) php -d memory_limit=1024m vendor/bin/php-cs-fixer
 help:
 	@grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
 
+
 ##
 ## Project setup
 ##---------------------------------------------------------------------------
@@ -124,7 +125,8 @@ security-check: vendor                                                          
 test-schema: vendor                                                                                    ## Test the doctrine Schema
 	$(EXEC) $(CONSOLE) doctrine:schema:validate --skip-sync -vvv --no-interaction
 
-test-all: lint test-schema security-check tests
+test-all: lint test-schema security-check tests                                                        ## Lint all, run schema and security check, then unit and functionnal tests
+
 
 ##
 ## Dependencies
