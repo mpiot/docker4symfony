@@ -148,7 +148,7 @@ RUN set -ex; \
         } >> /usr/local/etc/php/php.ini \
     ; fi
 
-CMD ["supervisord"]
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 
 #####################################
@@ -180,7 +180,7 @@ FROM app as app-prod
 
 ENV APP_ENV=prod
 
-COPY --chown=www-data  --from=vendor-builder /app /app
+COPY --chown=www-data --from=vendor-builder /app /app
 WORKDIR /app
 
 # Edit OPCache configuration
@@ -195,4 +195,4 @@ RUN ["chmod", "+x", "/usr/local/bin/entrypoint.sh"]
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-CMD ["supervisord"]
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
