@@ -1,4 +1,4 @@
-FROM mysql:8.0.14
+FROM mysql:8.0.16
 
 # set MySQL config
 RUN rm /etc/mysql/conf.d/mysql.cnf

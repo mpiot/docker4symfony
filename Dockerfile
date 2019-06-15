@@ -1,8 +1,8 @@
-ARG NODE_VERSION=11.12.0
-ARG COMPOSER_VERSION=1.8.4
-ARG PHP_VERSION=7.3.3
-ARG ICU_VERSION=64.1
 ARG APCU_VERSION=5.1.17
+ARG COMPOSER_VERSION=1.8.6
+ARG ICU_VERSION=64.2
+ARG NODE_VERSION=12.4.0
+ARG PHP_VERSION=7.3.6
 ARG XDEBUG_VERSION=2.7.2
 
 
@@ -167,7 +167,7 @@ RUN yarn install && yarn build && rm -R node_modules
 #####################################
 FROM composer:${COMPOSER_VERSION} as vendor-builder
 
-COPY --chown=www-data --from=assets-builder /app /app
+COPY --from=assets-builder /app /app
 WORKDIR /app
 
 RUN APP_ENV=prod composer install -o -n --no-ansi --no-dev
@@ -180,7 +180,7 @@ FROM app as app-prod
 
 ENV APP_ENV=prod
 
-COPY --from=vendor-builder /app /app
+COPY --chown=www-data  --from=vendor-builder /app /app
 WORKDIR /app
 
 # Edit OPCache configuration
@@ -191,6 +191,7 @@ RUN set -ex; \
 
 # copy the Entrypoint
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN ["chmod", "+x", "/usr/local/bin/entrypoint.sh"]
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
