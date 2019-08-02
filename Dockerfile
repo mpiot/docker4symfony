@@ -1,8 +1,8 @@
-ARG APCU_VERSION=5.1.17
-ARG COMPOSER_VERSION=1.8.6
-ARG ICU_VERSION=64.2
 ARG NODE_VERSION=12.4.0
+ARG COMPOSER_VERSION=1.8.6
 ARG PHP_VERSION=7.3.6
+ARG ICU_VERSION=64.2
+ARG APCU_VERSION=5.1.17
 ARG XDEBUG_VERSION=2.7.2
 
 
@@ -106,8 +106,8 @@ RUN set -ex; \
     # Install required system packages
     apt-get update; \
     apt-get install -qy --no-install-recommends \
-            unzip \
             git \
+            unzip \
     ; \
     # Clean aptitude cache and tmp directory
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*;
@@ -148,6 +148,8 @@ RUN set -ex; \
         } >> /usr/local/etc/php/php.ini \
     ; fi
 
+ENV APP_VERSION=0.0.0
+
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 
@@ -178,7 +180,8 @@ RUN APP_ENV=prod composer install -o -n --no-ansi --no-dev
 #####################################
 FROM app as app-prod
 
-ENV APP_ENV=prod
+ENV APP_ENV=prod \
+    APP_VERSION=0.0.0
 
 COPY --chown=www-data --from=vendor-builder /app /app
 WORKDIR /app

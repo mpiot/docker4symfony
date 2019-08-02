@@ -5,11 +5,12 @@ PHPCSFIXER?=$(EXEC) php -d memory_limit=1024m vendor/bin/php-cs-fixer
 
 .DEFAULT_GOAL := help
 .PHONY: help start stop restart install uninstall reset clear-cache shell clear clean
-.PHONY: wait-for-db db-diff db-migrate db-rollback db-reset db-fixtures db-validate
+.PHONY: db-diff db-migrate db-rollback db-reset db-fixtures db-validate wait-for-db
 .PHONY: watch assets assets-build
-.PHONY: tests lint lint-symfony lint-yaml lint-twig lint-xliff php-cs php-cs-fix security-check test-schema test-all
+tests tests-weak tests-unit tests-functional tests-functional-front tests-functional-back lint lint-symfony lint-yaml lint-twig lint-xliff php-cs php-cs-fix security-check test-schema test-all test-all-weak test-db-refresh
 .PHONY: deps
-.PHONY: build up perm docker-compose.override.yml
+.PHONY: build up perm
+.PHONY: docker-compose.override.yml
 
 help:
 	@grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
@@ -93,6 +94,7 @@ assets: node_modules                                                            
 assets-build: node_modules                                                                             ## Build the production version of the assets
 	$(EXEC) yarn build
 
+
 ##
 ## Tests
 ##---------------------------------------------------------------------------
@@ -100,12 +102,27 @@ assets-build: node_modules                                                      
 tests:                                                                                                 ## Run all the PHP tests
 	$(EXEC) bin/phpunit
 
-lint: lint-symfony php-cs                                                                              ## Run lint on Twig, YAML, XLIFF, and PHP files
+tests-weak:                                                                                            ## Run all the PHP tests without Deprecations helper
+	$(DOCKER_COMPOSE) exec -e SYMFONY_DEPRECATIONS_HELPER=weak app bin/phpunit
+
+tests-unit:                                                                                            ## Run the PHP unit tests
+	$(EXEC) bin/phpunit --group unit
+
+tests-functional:                                                                                      ## Run the PHP functional tests
+	$(EXEC) bin/phpunit --group functional
+
+tests-functional-front:                                                                                ## Run the PHP functional tests for Front
+	$(EXEC) bin/phpunit --group functional-front
+
+tests-functional-back:                                                                                 ## Run the PHP functional tests for Back
+	$(EXEC) bin/phpunit --group functional-back
+
+lint: lint-symfony php-cs                                                                              ## Run lint on Twig, YAML, PHP and Javascript files
 
 lint-symfony: lint-yaml lint-twig lint-xliff                                                           ## Lint Symfony (Twig and YAML) files
 
 lint-yaml:                                                                                             ## Lint YAML files
-	$(EXEC) $(CONSOLE) lint:yaml config
+	$(EXEC) $(CONSOLE) lint:yaml --parse-tags config
 
 lint-twig:                                                                                             ## Lint Twig files
 	$(EXEC) $(CONSOLE) lint:twig templates
@@ -116,16 +133,23 @@ lint-xliff:                                                                     
 php-cs: vendor                                                                                         ## Lint PHP code
 	$(PHPCSFIXER) fix --diff --dry-run --no-interaction -v
 
-php-cs-fix: vendor                                                                                     ## Fix PHP code to follow the convention
+php-cs-fix: vendor                                                                                     ## Lint and fix PHP code to follow the convention
 	$(PHPCSFIXER) fix
 
 security-check: vendor                                                                                 ## Check for vulnerable dependencies
 	$(EXEC) vendor/bin/security-checker security:check
 
-test-schema: vendor                                                                                    ## Test the doctrine Schema
+test-schema: vendor                                                                                    ## Test the doctrine Schema
 	$(EXEC) $(CONSOLE) doctrine:schema:validate --skip-sync -vvv --no-interaction
 
-test-all: lint test-schema security-check tests                                                        ## Lint all, run schema and security check, then unit and functionnal tests
+test-all: lint test-schema security-check tests                                                        ## Lint all, check vulnerable dependencies, run PHP tests
+
+test-all-weak: lint test-schema security-check tests-weak                                              ## Lint all, check vulnerable dependencies, run PHP tests without Deprecations helper
+
+test-db-refresh:                                                                                       ## Refresh the test database
+	$(EXEC) /bin/sh -c "DATABASE_URL=sqlite:///var/data/test.sqlite $(CONSOLE) doctrine:schema:drop --force"
+	$(EXEC) /bin/sh -c "DATABASE_URL=sqlite:///var/data/test.sqlite $(CONSOLE) doctrine:schema:update --force"
+	$(EXEC) /bin/sh -c "DATABASE_URL=sqlite:///var/data/test.sqlite $(CONSOLE) doctrine:fixtures:load -n"
 
 
 ##
@@ -164,7 +188,7 @@ vendor: composer.lock
 	$(EXEC) composer install -n
 
 composer.lock: composer.json
-	@echo composer.lock is not up to date.
+	@echo compose.lock is not up to date.
 
 node_modules: yarn.lock
 	$(EXEC) yarn install
